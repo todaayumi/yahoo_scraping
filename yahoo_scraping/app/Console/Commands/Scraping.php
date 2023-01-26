@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Weidner\Goutte\GoutteFacade as GoutteFacade;
+use App\Article;
 
 class Scraping extends Command
 {
@@ -41,10 +42,16 @@ class Scraping extends Command
         $goutte = GoutteFacade::request('GET', 'https://news.yahoo.co.jp/');
         $goutte->filter('.gEuKmd')->each(function ($ul) {
             $ul->filter('li')->each(function ($li) {
-                echo $li->filter('.kitJFB')->text();
-                echo "\n";
-                echo $li->filter('.kitJFB')->attr('href');
-                echo "\n";
+
+                // echo $li->filter('.kitJFB')->text();
+                // echo "\n";
+                // echo $li->filter('.kitJFB')->attr('href');
+                // echo "\n";
+
+                $article = new Article();
+                $article->title = $li->filter('.kitJFB')->text();
+                $article->url = $li->filter('.kitJFB')->attr('href');
+                $article->save();
             });
     });
 
