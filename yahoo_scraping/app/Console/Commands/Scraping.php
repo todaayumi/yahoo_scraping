@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Weidner\Goutte\GoutteFacade as GoutteFacade;
-use App\Article;
+use DB;
 
 class Scraping extends Command
 {
@@ -43,15 +43,13 @@ class Scraping extends Command
         $goutte->filter('.gEuKmd')->each(function ($ul) {
             $ul->filter('li')->each(function ($li) {
 
-                // echo $li->filter('.kitJFB')->text();
-                // echo "\n";
-                // echo $li->filter('.kitJFB')->attr('href');
-                // echo "\n";
+                $articles = DB::table('articles')->get();
 
-                $article = new Article();
-                $article->title = $li->filter('.kitJFB')->text();
-                $article->url = $li->filter('.kitJFB')->attr('href');
-                $article->save();
+                foreach ($articles as $article) {
+                    echo $article->title;
+                    echo "\n";
+                }
+                
             });
     });
 
