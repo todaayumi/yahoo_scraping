@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Weidner\Goutte\GoutteFacade as GoutteFacade;
 use DB;
+use App\Article;
 
 class Scraping extends Command
 {
@@ -39,19 +40,27 @@ class Scraping extends Command
      */
     public function handle()
     {
-        $goutte = GoutteFacade::request('GET', 'https://news.yahoo.co.jp/');
-        $goutte->filter('.gEuKmd')->each(function ($ul) {
-            $ul->filter('li')->each(function ($li) {
-
-                $articles = DB::table('articles')->get();
-
-                foreach ($articles as $article) {
-                    echo $article->title;
-                    echo "\n";
-                }
+        $goutte = GoutteFacade::request('GET', 'https://news.yahoo.co.jp/topics/top-picks');
+        $DB_lates = Article::orderBy('created_at', 'desc')->limit(8)->get();
+        
+        $goutte->filter('.newsFeed_list')->each(function ($ul) {
+          $ul->filter('.newsFeed_item')->each(function ($li) {
+            $li->filter('.newsFeed_item_link')->each(function ($a){
+                echo $a->filter('.newsFeed_item_title')->text();
+                echo "\n";
+                echo $a->attr('href');
+                echo "\n";
+                echo $a->filter('time')->text();
+                echo "\n";
+            
+        });
                 
             });
-    });
+        });
+    }
 
-}
+                
+
+
+
 }
