@@ -42,16 +42,49 @@ class Scraping extends Command
     {
         $goutte = GoutteFacade::request('GET', 'https://news.yahoo.co.jp/topics/top-picks');
         $DB_lates = Article::orderBy('created_at', 'desc')->limit(8)->get();
+
+        
         
         $goutte->filter('.newsFeed_list')->each(function ($ul) {
           $ul->filter('.newsFeed_item')->each(function ($li) {
             $li->filter('.newsFeed_item_link')->each(function ($a){
-                echo $a->filter('.newsFeed_item_title')->text();
-                echo "\n";
-                echo $a->attr('href');
-                echo "\n";
-                echo $a->filter('time')->text();
-                echo "\n";
+
+                //$article = new Article;
+                //$article->title = $a->filter('.newsFeed_item_title')->text();
+                //$article->url = $a->attr('href');
+                $datetime = $a->filter('time')->text();
+                //$article->save();
+
+                $year = date('Y');
+                $month = mb_strlen(date('n'));
+                $day = mb_strlen(date('j'));
+                
+                if($month = 1){
+                    if($day = 1){
+                        $date = $year .'-0' . str_replace('/', '-', substr($datetime, 0, 4))
+                                . ' '. substr($datetime, 9, 13) . ':00';
+                                ;
+                    }else{
+                        $date = $year . '-0' . str_replace('/', '-', substr($datetime, 0, 5))
+                                .' '. substr($datetime, 10, 14) . ':00';
+                    }
+                }else{
+                    if($day = 1){
+                        $date = $year . '-0' . str_replace('/', '-', substr($datetime, 0, 5))
+                        .' '. substr($datetime, 10, 14) . ':00';
+                    }else{
+                        $date = $year . '-0' . str_replace('/', '-', substr($datetime, 0, 6))
+                        .' '. substr($datetime, 11, 15) . ':00';
+                    }
+                }
+
+                echo $date;
+            
+            
+                
+                
+                
+                
             
         });
                 
